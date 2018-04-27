@@ -49,6 +49,8 @@ Here are the README details from the batch file (which you can view by opening t
 ################################################################
 ```
 
+## Configuration
+
 There are a few variable you will need to set before running the batch file on your Windows machine - do this by editing the batch file with a simple text editor such as Notepad:
 
 ```
@@ -59,6 +61,14 @@ SET WIRESHARK_EXE=C:\Program Files\Wireshark\Wireshark.exe
 SET PLINK=C:\Program Files (x86)\PuTTY\plink.exe
 SET WLAN_PI_IFACE=wlan0
 ```
+## Usage
+
+```
+Usage:
+ WLANPiShark.bat [ch number] { 20 | 40+ | 40- }
+ WLANPiShark.bat -v
+ 
+ ```
 
 ## Screenshots
 
