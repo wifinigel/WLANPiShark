@@ -60,4 +60,9 @@ SET PLINK=C:\Program Files (x86)\PuTTY\plink.exe
 SET WLAN_PI_IFACE=wlan0
 ```
 
+## Screenshots
+
+![Screenshot1](https://github.com/wifinigel/WLANPiShark/blob/master/screenshot1.png)
+
+![Screenshot2](https://github.com/wifinigel/WLANPiShark/blob/master/screenshot2.png)
 
