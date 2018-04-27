@@ -10,8 +10,9 @@ REM #
 REM # Set the variables below to point at your local copy of 
 REM # Wireshark and configure the WLANPi credentials & IP address
 REM # (Note that the user account on the WLANPi must be an admin 
-REM # account to allow the sudo command to be executed). Please use a
-REM # plain text editor to make the updates (e.g. Notepad)
+REM # account to allow the sudo command to be executed - the default
+REM # account wlanpi/wlanpi works fine. Please use a plain text
+REM # editor to make the updates (e.g. Notepad)
 REM # 
 REM # You will need the 'plink.exe' executable that is bundled with
 REM # Putty to run this batch file. https://www.putty.org/)
@@ -30,12 +31,82 @@ REM # below. This should be a one-time operation, as the WLANPi should use
 REM # the same 169.254.x.x address each time. This operation also assumes 
 REM # your laptop/PC is set to use DHCP on its ethernet adapter (it will
 REM # also uses its own 169.254.x.x address for comms when it gets no
-REM # DHCP address.
+REM # IP address from DHCP).
 REM # 
-REM # Note that each time you want to change channels of start a new capture,
+REM # Note that each time you want to change channels or start a new capture,
 REM # you will need to close Wireshark and re-run this script. 
 REM # 
 REM # (Suggestions & feedback: wifinigel@gmail.com)
+REM # 
+REM #################################################################
+
+REM !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+REM !
+REM ! Set variables here, but make sure no trailing spaces 
+REM ! accidentally at end of lines - you WILL have issues!
+REM ! 
+REM !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+SET WLAN_PI_USER=wlanpi
+SET WLAN_PI_PWD=wlanpi
+SET WLAN_PI_IP=192.168.0.60
+SET WIRESHARK_EXE=C:\Program Files\Wireshark\Wireshark.exe
+SET PLINK=C:\Program Files (x86)\PuTTY\plink.exe
+SET WLAN_PI_IFACE=wlan0
+
+REM ############### NOTHING TO SET BELOW HERE #######################
+REM # This var is passed in from the command line (1-14, 36 - 165)
+SET CHANNEL=%1
+SET VERSION="WLANPiShark v0.6 (7th Apr 2018) WiFiNigel@gmail.com"
+
+IF "%1"=="" ( 
+ echo No channel passed! Usage:
+ echo     wshark.bat [ch number] { 20 ^| 40+ ^| 40- }
+ echo     wshark.bat -v
+ EXIT /B
+)
+
+Rem - Command line arg 1
+IF "%1"=="-v" (
+ echo %VERSION%
+ EXIT /B
+)
+
+IF "%2"=="" (
+ SET CHANNEL_WIDTH=HT20
+)
+
+Rem - Command line arg 2
+IF "%2"=="40+" (
+ SET CHANNEL_WIDTH=HT40+
+)
+
+IF "%2"=="40-" (
+ SET CHANNEL_WIDTH=HT40-
+)
+
+IF "%2"=="20" (
+ SET CHANNEL_WIDTH=HT20
+)
+
+Rem - Start remote commands on WLANPi
+echo Killing old tcpdump processes...
+"%PLINK%" -ssh -pw %WLAN_PI_PWD% %WLAN_PI_USER%@%WLAN_PI_IP% "echo %WLAN_PI_PWD% | sudo -S pkill -f tcpdump > /dev/null 2>&1
+
+echo Killing processes that may interfere with airmon-ng...
+"%PLINK%" -ssh -pw %WLAN_PI_PWD% %WLAN_PI_USER%@%WLAN_PI_IP% "echo %WLAN_PI_PWD% | sudo -S airmon-ng check kill > /dev/null 2>&1
+
+echo Bringing WLAN card up...
+"%PLINK%" -ssh -pw %WLAN_PI_PWD% %WLAN_PI_USER%@%WLAN_PI_IP% "echo %WLAN_PI_PWD% | sudo -S ifconfig %WLAN_PI_IFACE% up" 2> null
+
+echo Setting wireless adapter to channel %CHANNEL% (channel width %CHANNEL_WIDTH%)
+"%PLINK%" -ssh -pw %WLAN_PI_PWD% %WLAN_PI_USER%@%WLAN_PI_IP% "echo %WLAN_PI_PWD% | sudo -S iw %WLAN_PI_IFACE% set channel %CHANNEL% %CHANNEL_WIDTH%" 2> null
+
+echo Starting Wireshark....
+"%PLINK%" -ssh -pw %WLAN_PI_PWD% %WLAN_PI_USER%@%WLAN_PI_IP% "echo %WLAN_PI_PWD% | sudo -S tcpdump -n -i %WLAN_PI_IFACE% -U -s 0 -w - " | "%WIRESHARK_EXE%" -k -i -
+
+REM #################################################################
+REM # 
+REM # Version history;
 REM # 
 REM # v0.1 - N.Bowden 2nd Apr 2018
 REM #
@@ -65,49 +136,9 @@ REM #  v0.5 - N.Bowden 6th Apr 2018
 REM # 
 REM #         Added -U option to switch off buffering of tcpdump and
 REM #         improve frame capture rate
+REM #
+REM #  v0.6 - N.Bowden 7th Apr 2018
+REM #
+REM #         Added channel width option to command line options
 REM # 
 REM #################################################################
-
-REM !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-REM !
-REM ! Set variables here, but make sure no trailing spaces 
-REM ! accidentally at end of lines - you WILL have issues!
-REM ! 
-REM !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-SET WLAN_PI_USER=wlanpi
-SET WLAN_PI_PWD=wlanpi
-SET WLAN_PI_IP=169.254.8.237
-SET WIRESHARK_EXE=C:\Program Files (x86)\Wireshark\Wireshark.exe
-SET PLINK=C:\Program Files (x86)\PuTTY\plink.exe
-SET WLAN_PI_IFACE=wlan0
-
-REM ############### NOTHING TO SET BELOW HERE #######################
-REM # This var is passed in from the command line (1-14, 36 - 165)
-SET CHANNEL=%1
-SET VERSION="WLANPiShark v0.5 (6th Apr 2018) WiFiNigel@gmail.com"
-
-IF "%1"=="" ( 
- echo No channel passed! Usage: wshark.bat [ch number] | [-v]
- EXIT /B
-)
-
-IF "%1"=="-v" (
- echo %VERSION%
- EXIT /B
-)
-
-echo Killing old tcpdump processes...
-"%PLINK%" -ssh -pw %WLAN_PI_PWD% %WLAN_PI_USER%@%WLAN_PI_IP% "echo %WLAN_PI_PWD% | sudo -S pkill -f tcpdump > /dev/null 2>&1
-
-echo Killing processes that may interfere with airmon-ng...
-"%PLINK%" -ssh -pw %WLAN_PI_PWD% %WLAN_PI_USER%@%WLAN_PI_IP% "echo %WLAN_PI_PWD% | sudo -S airmon-ng check kill > /dev/null 2>&1
-
-echo Bringing WLAN card up...
-"%PLINK%" -ssh -pw %WLAN_PI_PWD% %WLAN_PI_USER%@%WLAN_PI_IP% "echo %WLAN_PI_PWD% | sudo -S ifconfig %WLAN_PI_IFACE% up" 2> null
-
-echo Setting wireless adapter to channel %CHANNEL%
-"%PLINK%" -ssh -pw %WLAN_PI_PWD% %WLAN_PI_USER%@%WLAN_PI_IP% "echo %WLAN_PI_PWD% | sudo -S iwconfig %WLAN_PI_IFACE% mode Monitor channel %CHANNEL%" 2> null
-
-echo Starting Wireshark....
-"%PLINK%" -ssh -pw %WLAN_PI_PWD% %WLAN_PI_USER%@%WLAN_PI_IP% "echo %WLAN_PI_PWD% | sudo -S tcpdump -n -i %WLAN_PI_IFACE% -U -s 0 -w - " | "%WIRESHARK_EXE%" -k -i -
-
