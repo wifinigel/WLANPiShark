@@ -98,6 +98,9 @@ echo Killing processes that may interfere with airmon-ng...
 echo Bringing WLAN card up...
 "%PLINK%" -ssh -pw %WLAN_PI_PWD% %WLAN_PI_USER%@%WLAN_PI_IP% "echo %WLAN_PI_PWD% | sudo -S ifconfig %WLAN_PI_IFACE% up" 2> null
 
+echo Setting wireless adapter to monitor mode
+"%PLINK%" -ssh -pw %WLAN_PI_PWD% %WLAN_PI_USER%@%WLAN_PI_IP% "echo %WLAN_PI_PWD% | sudo -S iw %WLAN_PI_IFACE% set monitor none" 2> null
+
 echo Setting wireless adapter to channel %CHANNEL% (channel width %CHANNEL_WIDTH%)
 "%PLINK%" -ssh -pw %WLAN_PI_PWD% %WLAN_PI_USER%@%WLAN_PI_IP% "echo %WLAN_PI_PWD% | sudo -S iw %WLAN_PI_IFACE% set channel %CHANNEL% %CHANNEL_WIDTH%" 2> null
 
