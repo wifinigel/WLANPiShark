@@ -1,4 +1,5 @@
 @ECHO OFF
+setlocal
 REM #################################################################
 REM # 
 REM # This script runs on a Windows 10 machine and will allow
@@ -56,17 +57,19 @@ SET WLAN_PI_IFACE=wlan0
 REM ############### NOTHING TO SET BELOW HERE #######################
 REM # This var is passed in from the command line (1-14, 36 - 165)
 SET CHANNEL=%1
-SET VERSION="WLANPiShark v0.6 (7th Apr 2018) WiFiNigel@gmail.com"
+SET VERSION="WLANPiShark v0.7 (28th Apr 2018) WiFiNigel@gmail.com"
 
-IF "%1"=="" ( 
- echo No channel passed! Usage:
- echo     wshark.bat [ch number] { 20 ^| 40+ ^| 40- }
- echo     wshark.bat -v
- EXIT /B
+IF "%1"=="" (
+   echo.
+   echo *** No channel passed! Usage: ***
+   GOTO usage
 )
+
+IF "%1"=="-h" GOTO usage
 
 Rem - Command line arg 1
 IF "%1"=="-v" (
+ echo.
  echo %VERSION%
  EXIT /B
 )
@@ -88,6 +91,15 @@ IF "%2"=="20" (
  SET CHANNEL_WIDTH=HT20
 )
 
+Rem if CHANNEL_WIDTH still not set, must be inavlid option entered
+IF "%CHANNEL_WIDTH%"=="" (
+ echo.
+ echo Inavlid channel width selection: %CHANNEL_WITDH%
+ GOTO usage
+)
+
+echo Starting session to device %WLAN_PI_IP% ...
+
 Rem - Start remote commands on WLANPi
 echo Killing old tcpdump processes...
 "%PLINK%" -ssh -pw %WLAN_PI_PWD% %WLAN_PI_USER%@%WLAN_PI_IP% "echo %WLAN_PI_PWD% | sudo -S pkill -f tcpdump > /dev/null 2>&1
@@ -105,7 +117,16 @@ echo Setting wireless adapter to channel %CHANNEL% (channel width %CHANNEL_WIDTH
 "%PLINK%" -ssh -pw %WLAN_PI_PWD% %WLAN_PI_USER%@%WLAN_PI_IP% "echo %WLAN_PI_PWD% | sudo -S iw %WLAN_PI_IFACE% set channel %CHANNEL% %CHANNEL_WIDTH%" 2> null
 
 echo Starting Wireshark....
-"%PLINK%" -ssh -pw %WLAN_PI_PWD% %WLAN_PI_USER%@%WLAN_PI_IP% "echo %WLAN_PI_PWD% | sudo -S tcpdump -n -i %WLAN_PI_IFACE% -U -s 0 -w - " | "%WIRESHARK_EXE%" -k -i -
+"%PLINK%" -ssh -pw %WLAN_PI_PWD% %WLAN_PI_USER%@%WLAN_PI_IP% "echo %WLAN_PI_PWD% | sudo -S tcpdump -n -i %WLAN_PI_IFACE% -U -s 65535 -w - " | "%WIRESHARK_EXE%" -k -i -
+
+EXIT /B
+
+:usage
+ echo.
+ echo     WLANPIShark.bat [ch number] { 20 ^| 40+ ^| 40- }
+ echo     WLANPIShark.bat -v
+ echo     WLANPIShark.bat -h
+ EXIT /B
 
 REM #################################################################
 REM # 
@@ -143,5 +164,12 @@ REM #
 REM #  v0.6 - N.Bowden 7th Apr 2018
 REM #
 REM #         Added channel width option to command line options
+REM # 
+REM #  v0.7 - N.Bowden 28th Apr 2018
+REM #
+REM #         Tidied up usage output & added -h option. Also fixed
+REM #         bad channel width option detection (local vars) between
+REM #         script invocations. Changed Wireshark -s from 0 to 65535
+REM #         to limit number of bad frames
 REM # 
 REM #################################################################
