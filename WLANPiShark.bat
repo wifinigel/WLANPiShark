@@ -117,7 +117,7 @@ echo Setting wireless adapter to channel %CHANNEL% (channel width %CHANNEL_WIDTH
 "%PLINK%" -ssh -pw %WLAN_PI_PWD% %WLAN_PI_USER%@%WLAN_PI_IP% "echo %WLAN_PI_PWD% | sudo -S iw %WLAN_PI_IFACE% set channel %CHANNEL% %CHANNEL_WIDTH%" 2> null
 
 echo Starting Wireshark....
-"%PLINK%" -ssh -pw %WLAN_PI_PWD% %WLAN_PI_USER%@%WLAN_PI_IP% "echo %WLAN_PI_PWD% | sudo -S tcpdump -n -i %WLAN_PI_IFACE% -U -s 65535 -w - " | "%WIRESHARK_EXE%" -k -i -
+"%PLINK%" -ssh -pw %WLAN_PI_PWD% %WLAN_PI_USER%@%WLAN_PI_IP% "echo %WLAN_PI_PWD% | sudo -S tcpdump -n -i %WLAN_PI_IFACE% -U -s 0 -w - " | "%WIRESHARK_EXE%" -k -i -
 
 EXIT /B
 
