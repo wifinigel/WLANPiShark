@@ -169,7 +169,6 @@ REM #  v0.7 - N.Bowden 28th Apr 2018
 REM #
 REM #         Tidied up usage output & added -h option. Also fixed
 REM #         bad channel width option detection (local vars) between
-REM #         script invocations. Changed Wireshark -s from 0 to 65535
-REM #         to limit number of bad frames
+REM #         script invocations.
 REM # 
 REM #################################################################
