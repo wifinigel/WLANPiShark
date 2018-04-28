@@ -67,6 +67,7 @@ SET WLAN_PI_IFACE=wlan0
 Usage:
  WLANPiShark.bat [ch number] { 20 | 40+ | 40- }
  WLANPiShark.bat -v
+ WLANPiShark.bat -h
  
  ```
 
