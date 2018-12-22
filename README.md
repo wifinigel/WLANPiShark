@@ -133,4 +133,4 @@ HELP:
 ![Screenshot2](https://github.com/wifinigel/WLANPiShark/blob/master/screenshot2.png)
 
 ## Caveats
-- Note that this is work in progress and is not production ready and is not fully tested or guaranteed to report accurate info. **You have been warned**
+- Note that this is work in progress and I cannot guarantee its reliability - use at your own risk
