@@ -64,13 +64,68 @@ SET WLAN_PI_IFACE=wlan0
 ## Usage
 
 ```
-Usage:
- WLANPiShark.bat [ch number] { 20 | 40+ | 40- }
- WLANPiShark.bat -v
- WLANPiShark.bat -h
+ USAGE:
+
+  WLANPiShark.bat [--channel nn] { --width 20 | 40+ | 40- } { --filter "capture filter"} { --slice nnn } { --ip nnn.nnn.nnn.nnn }
+
+  WLANPiShark.bat [-c nn] { -w 20 | 40+ | 40- } { -f "capture filter"} { -s nnn } { -i nnn.nnn.nnn.nnn}
+
+  WLANPiShark.bat /?, -h, --help           shows basic help
+  WLANPiShark.bat /??, -hh, --xhelp        shows extra help
+  WLANPiShark.bat /v, -v, --version        shows the version
  
  ```
+## Additional Help
 
+```
+HELP:
+
+  WLANPiShark.bat [--channel nn] { --width 20 | 40+ | 40- } { --filter "capture filter"} { --slice nnn } { --ip nnn.nnn.nnn.nnn }
+
+  WLANPiShark.bat [-c nn] { -w 20 | 40+ | 40- } { -f "capture filter"} { -s nnn } { -i nnn.nnn.nnn.nnn}
+
+  WLANPiShark.bat /?, -h, --help           shows basic help
+  WLANPiShark.bat /??, -hh, --xhelp        shows extra help
+  WLANPiShark.bat /v, -v, --version        shows the version
+
+  Command Line Capture Options:
+
+   --channel or -c : (Mandatory) Channel number to capture (1-13, 36-165)
+
+   --width or -w   : (Optional) Channel width to be used for capture
+                      Available values: 20, 40+, 40- (default: 20Mhz)
+
+   --filter or -f  : (Optional) tcpdump capture filter (must be enclosed in quotes)
+                      Examples:
+                               "wlan type mgt" - capture only management frames
+                               "wlan type ctl" - capture only control frames
+                               "wlan type mgt subtype beacon" - capture only beacon frames
+
+    See more details at: http://wifinigel.blogspot.com/2018/04/wireshark-capture-filters-for-80211.html
+
+   --slice or -s   : (Optional) Slice captured frames to capture only headers and reduce size of capture
+                                file. Provide value for number of bytes to be captured per frame.
+
+   --ip or -i      : (Optional) IP address of WLANPi. Note that if this is ommitted, the hard coded version in the
+                                batch file itself will be used
+
+  Example:
+
+   1. Capture all frames on channel 36:
+
+       WLANPiShark.bat -c 36
+
+   2. Capture the first 200 bytes of beacon frames on 20MHz channel 48:
+
+       WLANPiShark.bat -c 48 -w 20 -s 200 -f "wlan type mgt subtype beacon"
+
+   Bugs:
+       Please report to wifinigel@gmail.com
+
+   More Information:
+       Visit: https://github.com/wifinigel/WLANPiShark
+
+```
 ## Screenshots
 
 ![Screenshot1](https://github.com/wifinigel/WLANPiShark/blob/master/screenshot1.png)
@@ -78,4 +133,4 @@ Usage:
 ![Screenshot2](https://github.com/wifinigel/WLANPiShark/blob/master/screenshot2.png)
 
 ## Caveats
-- Note that this is work in progress and is not production ready and is not fully tested or guaranteed to report accurate info. **You have been warned**
+- Note that this is work in progress and I cannot guarantee its reliability - use at your own risk
