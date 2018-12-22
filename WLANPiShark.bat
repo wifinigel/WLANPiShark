@@ -81,9 +81,9 @@ REM ############### NOTHING TO set BELOW HERE #######################
     if /i "%~1"=="-hh"        call :header & goto :extra_help
     if /i "%~1"=="--xhelp"    call :header & goto :extra_help
     
-    if /i "%~1"=="/v"         call :version      & goto :end
-    if /i "%~1"=="-v"         call :version      & goto :end
-    if /i "%~1"=="--version"  call :version full & goto :end
+    if /i "%~1"=="/v"         goto :version 
+    if /i "%~1"=="-v"         goto :version
+    if /i "%~1"=="--version"  goto :version
     
     rem - Handle mutliple parameter entries
     
@@ -145,7 +145,6 @@ EXIT /B
 
 :header
     echo.
-    echo  
     echo  %__NAME% v%__VERSION% - A Windows batch file to stream tcpdump
     echo  running on a WLANPi to Wireshark on a Windows machine
     echo.
