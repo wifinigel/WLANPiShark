@@ -4,6 +4,8 @@ This is a windows bat file to be used in conjunction with a WLANPi device. It is
 
 The file requires some minor configuration using a simple text editor such as notepad to configure it for your Windows machine. The WLANPi requires no configuration - this batch files has been created specifically to ensure that no changes need to be made by the user on the WLAN device. You can build a WLANPi as per the instructions at (WLANPi.com)[http://WLANPi.com] and use this batch file with WLANPi the out of the box config.
 
+Here is a blog post that describes how to use this script with a WLANPi in more detail: (Blog Post)[https://wifinigel.blogspot.com/2019/01/wlanpishark-wireless-capture-with.html]
+
 Here are the README details from the batch file (which you can view by opening the batch file itself with a text editor):
 
 ```
