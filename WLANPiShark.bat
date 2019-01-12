@@ -49,16 +49,17 @@ REM !
 REM !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 set WLAN_PI_USER=wlanpi
 set WLAN_PI_PWD=wlanpi
-set WLAN_PI_IP=192.168.0.38
+set WLAN_PI_IP=192.168.42.1
 set WIRESHARK_EXE=C:\Program Files\Wireshark\Wireshark.exe
 set PLINK=C:\Program Files (x86)\PuTTY\plink.exe
 set WLAN_PI_IFACE=wlan0
+set IW_VER=4.14
 
 REM ############### NOTHING TO set BELOW HERE #######################
 :init
     set "__NAME=%~n0"
-    set "__VERSION=0.08"
-    set "__YEAR=2018"
+    set "__VERSION=0.09"
+    set "__YEAR=2019"
 
     set "__BAT_FILE=%~0"
     set "__BAT_PATH=%~dp0"
@@ -68,6 +69,8 @@ REM ############### NOTHING TO set BELOW HERE #######################
     set "CHANNEL_WIDTH=20"
     set "FILTER="
     set "SLICE=0"
+
+    
 
 :parse
     if "%~1"=="" goto :validate
@@ -115,6 +118,9 @@ REM ############### NOTHING TO set BELOW HERE #######################
     if "%CHANNEL_WIDTH%"=="20"  set "CHANNEL_WIDTH=HT20"  & goto :main
     if "%CHANNEL_WIDTH%"=="40+" set "CHANNEL_WIDTH=HT40+" & goto :main
     if "%CHANNEL_WIDTH%"=="40-" set "CHANNEL_WIDTH=HT40-" & goto :main
+    if not "%IW_VER%"=="4.9" (
+        if "%CHANNEL_WIDTH%"=="80" set "CHANNEL_WIDTH=80MHz" & goto :main
+    )
     call :incorrect_argument "Channel Width" %CHANNEL_WIDTH% & goto :end
 
 :main
@@ -154,22 +160,35 @@ EXIT /B
 :usage
     echo  USAGE:
     echo.
-    echo   %__BAT_NAME% [--channel nn] { --width 20 ^| 40+ ^| 40- } { --filter "capture filter"} { --slice nnn } { --ip nnn.nnn.nnn.nnn }
-    echo.
-    echo   %__BAT_NAME% [-c nn] { -w 20 ^| 40+ ^| 40- } { -f "capture filter"} { -s nnn } { -i nnn.nnn.nnn.nnn}
+    IF not "%IW_VER%"=="4.9" (
+        echo   %__BAT_NAME% [--channel nn] { --width 20 ^| 40+ ^| 40- ^| 80 } { --filter "capture filter"} { --slice nnn } { --ip nnn.nnn.nnn.nnn }
+        echo.
+        echo   %__BAT_NAME% [-c nn] { -w 20 ^| 40+ ^| 40- ^| 80 } { -f "capture filter"} { -s nnn } { -i nnn.nnn.nnn.nnn}
+        
+    ) ELSE (
+        echo   %__BAT_NAME% [--channel nn] { --width 20 ^| 40+ ^| 40- } { --filter "capture filter"} { --slice nnn } { --ip nnn.nnn.nnn.nnn }
+        echo.
+        echo   %__BAT_NAME% [-c nn] { -w 20 ^| 40+ ^| 40- } { -f "capture filter"} { -s nnn } { -i nnn.nnn.nnn.nnn}
+    )
     echo.
     echo.  %__BAT_NAME% /?, -h, --help           shows basic help
     echo.  %__BAT_NAME% /??, -hh, --xhelp        shows extra help
     echo.  %__BAT_NAME% /v, -v, --version        shows the version
     goto :end    
-    
-    
+
 :extra_help
     echo  HELP:
     echo.
-    echo   %__BAT_NAME% [--channel nn] { --width 20 ^| 40+ ^| 40- } { --filter "capture filter"} { --slice nnn } { --ip nnn.nnn.nnn.nnn }
-    echo.
-    echo   %__BAT_NAME% [-c nn] { -w 20 ^| 40+ ^| 40- } { -f "capture filter"} { -s nnn } { -i nnn.nnn.nnn.nnn}
+    if not "%IW_VER%"=="4.9" (
+        echo   %__BAT_NAME% [--channel nn] { --width 20 ^| 40+ ^| 40- ^| 80 } { --filter "capture filter"} { --slice nnn } { --ip nnn.nnn.nnn.nnn }
+        echo.
+        echo   %__BAT_NAME% [-c nn] { -w 20 ^| 40+ ^| 40- ^| 80 } { -f "capture filter"} { -s nnn } { -i nnn.nnn.nnn.nnn}
+        
+    ) ELSE (
+        echo   %__BAT_NAME% [--channel nn] { --width 20 ^| 40+ ^| 40- } { --filter "capture filter"} { --slice nnn } { --ip nnn.nnn.nnn.nnn }
+        echo.
+        echo   %__BAT_NAME% [-c nn] { -w 20 ^| 40+ ^| 40- } { -f "capture filter"} { -s nnn } { -i nnn.nnn.nnn.nnn}
+    )
     echo.
     echo.  %__BAT_NAME% /?, -h, --help           shows basic help
     echo.  %__BAT_NAME% /??, -hh, --xhelp        shows extra help
@@ -180,7 +199,11 @@ EXIT /B
     echo    --channel or -c : (Mandatory) Channel number to capture (1-13, 36-165)
     echo.
     echo    --width or -w   : (Optional) Channel width to be used for capture 
+    if not "%IW_VER%"=="4.9" (
+    echo                       Available values: 20, 40+, 40-, 80 (default: 20Mhz)
+    ) else (
     echo                       Available values: 20, 40+, 40- (default: 20Mhz)
+    )
     echo.
     echo    --filter or -f  : (Optional) tcpdump capture filter (must be enclosed in quotes)
     echo                       Examples: 
@@ -292,5 +315,14 @@ REM #         2. Added "slice" option to allow captured frame sizes to be reduce
 REM #         3. Use named CLI parameters instead of positional
 REM #         4. Added "ip" option to allow WLANPi address to be passed in via CLI
 REM #         5. Improved help info (--xhelp)
+REM #
+REM #  v0.9 - N.Bowden 6th Jan 2019
+REM #
+REM #         Added 80MHz channel support
+REM #
+REM #         1. New variable IW_VER needs to be set to value other than 4.9 
+REM #            to activate 80MHz channel support. Note that this requires
+REM #            IW version of 4.14 or greater. Check by accessing the WLANPi
+REM #            and entering : sudo iw --version
 REM #
 REM #################################################################
