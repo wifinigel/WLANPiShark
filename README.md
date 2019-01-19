@@ -45,7 +45,7 @@ Here are the README details from the batch file (which you can view by opening t
  IP address from DHCP).
  
  If you are using image version 1.5.0 or later of the WLANPi, (you
- can check by browsing to a WLANPi & checkout the top of the page)
+ can check by browsing to a WLANPi & check out the top of the page)
  then Ethernet over USB functionality is built in to the image. This
  means that you can use USB to both power the WLANPi and also provide
  an IP connection (no more Ethernet connection required!). Note that the 
@@ -98,7 +98,7 @@ WLANPiShark v0.09 - A Windows batch file to stream tcpdump
 ## Additional Help
 
 ```
-WLANPiShark v0.09 RC1 - A Windows batch file to stream tcpdump
+WLANPiShark v0.09 - A Windows batch file to stream tcpdump
  running on a WLANPi to Wireshark on a Windows machine
 
  HELP:
