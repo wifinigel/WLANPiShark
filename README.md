@@ -153,33 +153,33 @@ WLANPiShark v0.09 - A Windows batch file to stream tcpdump
 
 1. Capture on channel 52 (default 20Mhz width):
 
-'''
+```
 WLANPiShark.bat -c 52
-'''
+```
 
 2. Capture on channel 44 with a channel width of 40MHz (channels 44 + 48):
 
-'''
+```
 WLANPiShark.bat -c 44 -w 40+
-'''
+```
 
 3. Capture on channel 132 using 40MHz channels capturing only the first 200 bytes of each frame:
 
-'''
+```
 WLANPiShark.bat -c 132 -w 40+ -s 200
-'''
+```
 
 4. Capture on channel 52 using a channel width on 80MHz (assuming 80MHz support enabled - see notes at the top of this page). Note this will capture the 80MHz channel 52 - 64:
 
-'''
+```
 WLANPiShark.bat -c 52 -w 80
-'''
+```
 
 5. Capture only beacon frames on channel 100:
 
-'''
+```
 WLANPiShark.bat -c 100 -f wlan type mgt subtype beacon"
-'''
+```
 
 ## Filtering
 For more information about capture filters, please see my blog article at: [http://wifinigel.blogspot.com/2018/04/wireshark-capture-filters-for-80211.html]. The syntax shown for Wireshark capture filters in that article is the same as is required for the filter syntax used with this script.
