@@ -206,9 +206,12 @@ EXIT /B
         echo   %__BAT_NAME% [-c nn] { -w 20 ^| 40+ ^| 40- } { -f "capture filter"} { -s nnn } { -i nnn.nnn.nnn.nnn}
     )
     echo.
-    echo.  %__BAT_NAME% -h, --help           shows basic help
+    echo.  %__BAT_NAME% -h, --help          shows basic help
     echo.  %__BAT_NAME% -hh, --xhelp        shows extra help
-    echo.  %__BAT_NAME% -v, --version        shows the version
+    echo.  %__BAT_NAME% -v, --version       shows the version
+    IF "%IW_VER%"=="4.9" (
+        echo.  %__BAT_NAME% -u, --upgrade       shows how to enable 80MHz capture
+    )
     echo.
     echo   Command Line Capture Options:
     echo.
