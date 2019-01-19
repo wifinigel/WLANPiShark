@@ -23,7 +23,8 @@ REM # and will stream tcpdump data back to Wireshark on your Windows
 REM # machine from a WLANPi, allowing wireless frames decode. This script
 REM # was tested with a Comfast CF-912AC adapter plugged in to a WLANPi.
 REM # 
-REM # The best way to use this script with your WLANPi is to hook up a
+REM # If using a version of the WLANPi image prior to version 1.5.0, 
+REM # the best way to use this script with your WLANPi is to hook up a
 REM # ethernet cable between your laptop/PC and the WLANPi. Make sure you
 REM # do this before powering on your WLANPi. Then, when the WLANPi powers
 REM # up, you will see a 169.254.x.x address on the display of your WLANPi.
@@ -34,6 +35,19 @@ REM # your laptop/PC is set to use DHCP on its ethernet adapter (it will
 REM # also uses its own 169.254.x.x address for comms when it gets no
 REM # IP address from DHCP).
 REM # 
+REM # If you are using image version 1.5.0 or later of the WLANPi, (you
+REM # can check by browsing to a WLANPi & checkout the top of the page)
+REM # then Ethernet over USB functionality is built in to the image. This
+REM # means that you can use USB to both power the WLANPi and also provide
+REM # an IP connection (no more Ethernet connection required!). Note that the 
+REM # WLANPi display will still show the address 169.254.x.x in this mode, but
+REM # a new adapter should appear in the adapter list shown on your laptop.
+REM # The new adapter will be assigned an address via DHCP in the range 
+REM # 192.168.42.0/27, with the WLANPi using an address of 192.168.42.1. If
+REM # you have any difficulties with the new Ethernet over USB adapter 
+REM # appearing in your adapter list (ipconfig), then try a better quality
+REM # microUSB to USB cable, as some thinner cables seem to cause issues.
+REM # 
 REM # Note that each time you want to change channels or start a new capture,
 REM # you will need to close Wireshark and re-run this script. 
 REM # 
@@ -43,9 +57,12 @@ REM #################################################################
 
 REM !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 REM !
-REM ! Set variables here, but make sure no trailing spaces 
+REM ! Set your variables here, but make sure no trailing spaces 
 REM ! accidentally at end of lines - you WILL have issues!
 REM ! 
+REM ! Remember, 192.168.42.1 is the default WLANPi addreess when
+REM ! using Ethernet over USB. Also, change IW_VER from 4.9 to 
+REM ! 4.14 to activate 80MHz support
 REM !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 set WLAN_PI_USER=wlanpi
 set WLAN_PI_PWD=wlanpi
@@ -53,12 +70,12 @@ set WLAN_PI_IP=192.168.42.1
 set WIRESHARK_EXE=C:\Program Files\Wireshark\Wireshark.exe
 set PLINK=C:\Program Files (x86)\PuTTY\plink.exe
 set WLAN_PI_IFACE=wlan0
-set IW_VER=4.14
+set IW_VER=4.9
 
-REM ############### NOTHING TO set BELOW HERE #######################
+REM ############### NOTHING TO SET BELOW HERE #######################
 :init
     set "__NAME=%~n0"
-    set "__VERSION=0.09"
+    set "__VERSION=0.09 RC1"
     set "__YEAR=2019"
 
     set "__BAT_FILE=%~0"
@@ -70,23 +87,21 @@ REM ############### NOTHING TO set BELOW HERE #######################
     set "FILTER="
     set "SLICE=0"
 
-    
-
 :parse
     if "%~1"=="" goto :validate
 
     rem  - handle single instance command line args (help, version etc.)
-    if /i "%~1"=="/?"         call :header & goto :usage
     if /i "%~1"=="-h"         call :header & goto :usage
     if /i "%~1"=="--help"     call :header & goto :usage
 
-    if /i "%~1"=="/??"        call :header & goto :extra_help
     if /i "%~1"=="-hh"        call :header & goto :extra_help
     if /i "%~1"=="--xhelp"    call :header & goto :extra_help
     
-    if /i "%~1"=="/v"         goto :version 
     if /i "%~1"=="-v"         goto :version
     if /i "%~1"=="--version"  goto :version
+    
+    if /i "%~1"=="-u"  goto :upgrade
+    if /i "%~1"=="--upgrade"  goto :upgrade
     
     rem - Handle mutliple parameter entries
     
@@ -148,15 +163,13 @@ echo Starting Wireshark (Slice = %SLICE%, Capture filter = %FILTER%)...
 
 EXIT /B
 
-
 :header
     echo.
     echo  %__NAME% v%__VERSION% - A Windows batch file to stream tcpdump
     echo  running on a WLANPi to Wireshark on a Windows machine
     echo.
     goto :eof
-    
-    
+
 :usage
     echo  USAGE:
     echo.
@@ -171,9 +184,12 @@ EXIT /B
         echo   %__BAT_NAME% [-c nn] { -w 20 ^| 40+ ^| 40- } { -f "capture filter"} { -s nnn } { -i nnn.nnn.nnn.nnn}
     )
     echo.
-    echo.  %__BAT_NAME% /?, -h, --help           shows basic help
-    echo.  %__BAT_NAME% /??, -hh, --xhelp        shows extra help
-    echo.  %__BAT_NAME% /v, -v, --version        shows the version
+    echo.  %__BAT_NAME% -h, --help          shows basic help
+    echo.  %__BAT_NAME% -hh, --xhelp        shows extra help
+    echo.  %__BAT_NAME% -v, --version       shows the version
+    IF "%IW_VER%"=="4.9" (
+        echo.  %__BAT_NAME% -u, --upgrade       shows how to enable 80MHz capture
+    )
     goto :end    
 
 :extra_help
@@ -190,9 +206,9 @@ EXIT /B
         echo   %__BAT_NAME% [-c nn] { -w 20 ^| 40+ ^| 40- } { -f "capture filter"} { -s nnn } { -i nnn.nnn.nnn.nnn}
     )
     echo.
-    echo.  %__BAT_NAME% /?, -h, --help           shows basic help
-    echo.  %__BAT_NAME% /??, -hh, --xhelp        shows extra help
-    echo.  %__BAT_NAME% /v, -v, --version        shows the version
+    echo.  %__BAT_NAME% -h, --help           shows basic help
+    echo.  %__BAT_NAME% -hh, --xhelp        shows extra help
+    echo.  %__BAT_NAME% -v, --version        shows the version
     echo.
     echo   Command Line Capture Options:
     echo.
@@ -200,9 +216,9 @@ EXIT /B
     echo.
     echo    --width or -w   : (Optional) Channel width to be used for capture 
     if not "%IW_VER%"=="4.9" (
-    echo                       Available values: 20, 40+, 40-, 80 (default: 20Mhz)
+    echo                       Available values: 20, 40+, 40-, 80 ^(default: 20Mhz^)
     ) else (
-    echo                       Available values: 20, 40+, 40- (default: 20Mhz)
+    echo                       Available values: 20, 40+, 40- ^(default: 20Mhz^)
     )
     echo.
     echo    --filter or -f  : (Optional) tcpdump capture filter (must be enclosed in quotes)
@@ -229,6 +245,12 @@ EXIT /B
     echo.
     echo        WLANPiShark.bat -c 48 -w 20 -s 200 -f "wlan type mgt subtype beacon"
     echo.
+    if not "%IW_VER%"=="4.9" (
+        echo    3. Capture on 80MHz channel with base channel of 36 ^(i.e. 36,40,44,48^)
+        echo.
+        echo        WLANPiShark.bat -c 36 -w 80
+        echo.
+    )
     echo    Bugs:
     echo        Please report to wifinigel@gmail.com
     echo.
@@ -236,30 +258,42 @@ EXIT /B
     echo        Visit: https://github.com/wifinigel/WLANPiShark
     echo.
     goto :end
-    
-    
+
+:upgrade
+    echo.
+    echo. To upgrade this script to support 80MHz captures, edit this file
+    echo  to change the IW_VER variable from:
+    echo.
+    echo     set IW_VER=4.9
+    echo.
+    echo  to:
+    echo.
+    echo     set IW_VER=4.14
+    echo.
+    echo  Ensure you are running at least version 4.14 of 'iw' first!
+    echo  (SSH to WLANPi and run : sudo iw --version)
+    echo. 
+    goto :end    
+
 :version
     echo.
     echo.  %__BAT_NAME% 
     echo   Version: %__VERSION%
     echo.
     goto :eof
-    
-    
+
 :missing_argument
     echo.
     echo  **** Error: Missing required argument: %~1  ****
     echo.
     call :usage & goto :eof
-    
-    
+
 :incorrect_argument
     echo.
     echo  **** Error: Incorrect argument supplied for %~1 : %~2  ****
     echo.
     call :usage & goto :eof
-    
-    
+
 :end
     exit /B
     
@@ -316,7 +350,7 @@ REM #         3. Use named CLI parameters instead of positional
 REM #         4. Added "ip" option to allow WLANPi address to be passed in via CLI
 REM #         5. Improved help info (--xhelp)
 REM #
-REM #  v0.9 - N.Bowden 6th Jan 2019
+REM #  v0.9 - N.Bowden 19th Jan 2019
 REM #
 REM #         Added 80MHz channel support
 REM #
