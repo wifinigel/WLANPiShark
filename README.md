@@ -192,3 +192,7 @@ For more information about capture filters, please see my blog article at: [http
 
 ## Caveats
 - Note that this is work in progress and I cannot guarantee its reliability, despite my very best efforts - use at your own risk.
+
+## WLANPi Image Upgrade
+Here is a quick and dirty guide I put together to help you upgrade the image on your WLANPi: [https://github.com/wifinigel/WLANPiShark/blob/master/Upgrading_The_WLANPi_Image_v1.pdf]
+
