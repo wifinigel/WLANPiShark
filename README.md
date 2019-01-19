@@ -178,7 +178,7 @@ WLANPiShark.bat -c 52 -w 80
 5. Capture only beacon frames on channel 100:
 
 ```
-WLANPiShark.bat -c 100 -f wlan type mgt subtype beacon"
+WLANPiShark.bat -c 100 -f wlan type "mgt subtype beacon"
 ```
 
 ## Filtering
