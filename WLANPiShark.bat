@@ -150,13 +150,13 @@ echo Killing processes that may interfere with airmon-ng...
 "%PLINK%" -ssh -pw %WLAN_PI_PWD% %WLAN_PI_USER%@%WLAN_PI_IP% "echo %WLAN_PI_PWD% | sudo -S airmon-ng check kill > /dev/null 2>&1
 
 echo Bringing WLAN card up...
-"%PLINK%" -ssh -pw %WLAN_PI_PWD% %WLAN_PI_USER%@%WLAN_PI_IP% "echo %WLAN_PI_PWD% | sudo -S ifconfig %WLAN_PI_IFACE% up" 2> null
+"%PLINK%" -ssh -pw %WLAN_PI_PWD% %WLAN_PI_USER%@%WLAN_PI_IP% "echo %WLAN_PI_PWD% | sudo -S ifconfig %WLAN_PI_IFACE% up" 2> NUL
 
 echo Setting wireless adapter to monitor mode
-"%PLINK%" -ssh -pw %WLAN_PI_PWD% %WLAN_PI_USER%@%WLAN_PI_IP% "echo %WLAN_PI_PWD% | sudo -S iw %WLAN_PI_IFACE% set monitor none" 2> null
+"%PLINK%" -ssh -pw %WLAN_PI_PWD% %WLAN_PI_USER%@%WLAN_PI_IP% "echo %WLAN_PI_PWD% | sudo -S iw %WLAN_PI_IFACE% set monitor none" 2> NUL
 
 echo Setting wireless adapter to channel %CHANNEL% (channel width %CHANNEL_WIDTH%)
-"%PLINK%" -ssh -pw %WLAN_PI_PWD% %WLAN_PI_USER%@%WLAN_PI_IP% "echo %WLAN_PI_PWD% | sudo -S iw %WLAN_PI_IFACE% set channel %CHANNEL_NUMBER% %CHANNEL_WIDTH%" 2> null
+"%PLINK%" -ssh -pw %WLAN_PI_PWD% %WLAN_PI_USER%@%WLAN_PI_IP% "echo %WLAN_PI_PWD% | sudo -S iw %WLAN_PI_IFACE% set channel %CHANNEL_NUMBER% %CHANNEL_WIDTH%" 2> NUL
 
 echo Starting Wireshark (Slice = %SLICE%, Capture filter = %FILTER%)...
 "%PLINK%" -ssh -pw %WLAN_PI_PWD% %WLAN_PI_USER%@%WLAN_PI_IP% "echo %WLAN_PI_PWD% | sudo -S tcpdump -n -i %WLAN_PI_IFACE% -U -s %SLICE% -w - %FILTER%" | "%WIRESHARK_EXE%" -k -i -
@@ -358,5 +358,8 @@ REM #         1. New variable IW_VER needs to be set to value other than 4.9
 REM #            to activate 80MHz channel support. Note that this requires
 REM #            IW version of 4.14 or greater. Check by accessing the WLANPi
 REM #            and entering : sudo iw --version
+REM # 
+REM #         2. Changed '> null' to '> NUL' to stop creation of spurious
+REM #            null file (Windows equiv of /dev/null)
 REM #
 REM #################################################################
