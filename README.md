@@ -4,7 +4,7 @@ This is a windows bat file to be used in conjunction with a WLANPi device. It is
 
 The file requires some minor configuration using a simple text editor such as notepad to configure it for your Windows machine. The WLANPi requires no configuration - this batch files has been created specifically to ensure that no changes need to be made by the user on the WLANPi device. You can build a WLANPi as per the instructions at (WLANPi.com)[http://WLANPi.com] and use this batch file with WLANPi the out of the box config.
 
-Here is a blog post that describes how to use this script with a WLANPi in more detail: (Blog Post)[https://wifinigel.blogspot.com/2019/01/wlanpishark-wireless-capture-with.html]
+Here is a blog post that describes how to use this script with a WLANPi in more detail: [https://wifinigel.blogspot.com/2019/01/wlanpishark-wireless-capture-with.html]
 
 Here are the README details from the batch file (which you can view by opening the batch file itself with a text editor) and it is strongly recommended that you review this prior to using this script:
 
@@ -149,6 +149,36 @@ WLANPiShark v0.09 - A Windows batch file to stream tcpdump
    More Information:
        Visit: https://github.com/wifinigel/WLANPiShark
 ```
+## Examples
+
+1. Capture on channel 52 (default 20Mhz width):
+'''
+WLANPiShark.bat -c 52
+'''
+
+2. Capture on channel 44 with a channel width of 40MHz (channels 44 + 48):
+'''
+WLANPiShark.bat -c 44 -w 40+
+'''
+
+3. Capture on channel 132 using 40MHz channels capturing only the first 200 bytes of each frame:
+'''
+WLANPiShark.bat -c 132 -w 40+ -s 200
+'''
+
+4. Capture on channel 52 using a channel width on 80MHz (assuming 80MHz support enabled - see notes at the top of this page). Note this will capture the 80MHz channel 52 - 64.
+'''
+WLANPiShark.bat -c 52 -w 80
+'''
+
+5. Capture only beacon frames on channel 100
+'''
+WLANPiShark.bat -c 100 -f wlan type mgt subtype beacon"
+'''
+
+## Filtering
+For more information about capture filters, please see my blog article at: [http://wifinigel.blogspot.com/2018/04/wireshark-capture-filters-for-80211.html]. The syntax shown for Wireshark capture filters in that article is the same as is required for the filter syntax used with this script.
+
 ## Screenshots
 
 ![Screenshot1](https://github.com/wifinigel/WLANPiShark/blob/master/screenshot1.png)
