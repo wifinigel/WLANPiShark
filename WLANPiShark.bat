@@ -75,7 +75,7 @@ set IW_VER=4.9
 REM ############### NOTHING TO SET BELOW HERE #######################
 :init
     set "__NAME=%~n0"
-    set "__VERSION=0.09 RC1"
+    set "__VERSION=0.09"
     set "__YEAR=2019"
 
     set "__BAT_FILE=%~0"
