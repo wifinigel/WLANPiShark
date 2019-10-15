@@ -1,5 +1,9 @@
 # WLANPiShark
 
+**Note this project is now retired and has been replaced by a new project: https://github.com/WLAN-Pi/WLANPiShark2**
+
+------
+
 This is a windows bat file to be used in conjunction with a WLANPi device. It is run from a Windows command prompt and will start a remote streamed capture from a WLANPi device to Wireshark on a Windows machine running this bat file. This allows a Windows machine to run an over the air wireless capture, using the WLANPi as a remote sensor.
 
 The file requires some minor configuration using a simple text editor such as notepad to configure it for your Windows machine. The WLANPi requires no configuration - this batch files has been created specifically to ensure that no changes need to be made by the user on the WLANPi device. You can build a WLANPi as per the instructions at [http://WLANPi.com] and use this batch file with WLANPi the out of the box config.
